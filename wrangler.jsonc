@@ -1,0 +1,9 @@
+{
+  "name": "manager-dashboard",
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets"
+  },
+  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2025-01-01"
+}
