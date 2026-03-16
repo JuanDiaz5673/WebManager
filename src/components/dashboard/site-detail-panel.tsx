@@ -146,10 +146,10 @@ export function SiteDetailPanel({
   }, []);
 
   const statCards = [
-    { label: "Visitors", value: formatNumber(analytics.totalVisitors), icon: Users },
-    { label: "Page Views", value: formatNumber(analytics.totalPageViews), icon: Eye },
-    { label: "Requests", value: formatNumber(analytics.totalRequests), icon: Activity },
-    { label: "Bandwidth", value: formatBytes(analytics.totalBandwidth), icon: HardDrive },
+    { label: "Visitors", value: formatNumber(analytics.totalVisitors), icon: Users, accent: "text-blue-400", bg: "bg-blue-500/5", border: "border-blue-500/10" },
+    { label: "Page Views", value: formatNumber(analytics.totalPageViews), icon: Eye, accent: "text-amber-400", bg: "bg-amber-500/5", border: "border-amber-500/10" },
+    { label: "Requests", value: formatNumber(analytics.totalRequests), icon: Activity, accent: "text-violet-400", bg: "bg-violet-500/5", border: "border-violet-500/10" },
+    { label: "Bandwidth", value: formatBytes(analytics.totalBandwidth), icon: HardDrive, accent: "text-emerald-400", bg: "bg-emerald-500/5", border: "border-emerald-500/10" },
   ];
 
   const ranges: { label: string; value: DateRange }[] = [
@@ -164,32 +164,32 @@ export function SiteDetailPanel({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md animate-fade-in"
         onClick={onClose}
       />
 
       {/* Panel */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-0 px-0 sm:py-8 sm:px-4 md:py-12">
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-0 px-0 sm:py-6 sm:px-4 md:py-10">
         <div
-          className="relative w-full min-h-screen sm:min-h-0 max-w-5xl sm:rounded-xl border-0 sm:border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/50 animate-scale-in"
+          className="relative w-full min-h-screen sm:min-h-0 max-w-5xl sm:rounded-2xl border-0 sm:border border-zinc-800/60 bg-[#0c0c0e] shadow-2xl shadow-black/60 animate-slide-up sm:animate-scale-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Preview banner */}
-          <div className="relative overflow-hidden sm:rounded-t-xl">
-            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[280px] sm:h-[400px] md:h-[560px]" />
+          <div className="relative overflow-hidden sm:rounded-t-2xl">
+            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[280px] sm:h-[400px] md:h-[520px]" />
 
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 z-30 flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900/80 border border-zinc-700/50 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors backdrop-blur-sm"
+              className="absolute top-3 right-3 z-30 flex h-9 w-9 items-center justify-center rounded-xl bg-black/60 border border-white/10 text-zinc-400 hover:text-zinc-100 hover:bg-black/80 transition-all backdrop-blur-md"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Header — below preview */}
-          <div className="px-3.5 sm:px-5 pt-3 pb-1 flex items-start justify-between">
-            <div>
+          <div className="px-4 sm:px-6 pt-5 pb-2 flex items-start justify-between border-b border-zinc-800/40 mb-1">
+            <div className="pb-4">
               <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">
                 {project.name}
               </h2>
@@ -197,7 +197,7 @@ export function SiteDetailPanel({
                 href={primaryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors mt-0.5"
+                className="inline-flex items-center gap-1 text-[13px] text-zinc-500 hover:text-zinc-300 transition-colors mt-1"
               >
                 {domain}
                 <ExternalLink className="h-3 w-3" />
@@ -206,21 +206,23 @@ export function SiteDetailPanel({
             <UptimeBadge status={uptime} />
           </div>
 
-          <div className="p-3.5 sm:p-5 space-y-4 sm:space-y-5">
+          <div className="p-4 sm:p-6 space-y-5">
             {/* Stats row */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
               {statCards.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 p-3.5"
+                  className={`rounded-xl border ${stat.border} ${stat.bg} p-4`}
                 >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <stat.icon className="h-3.5 w-3.5 text-zinc-500" />
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-md ${stat.bg} border ${stat.border}`}>
+                      <stat.icon className={`h-3 w-3 ${stat.accent}`} />
+                    </div>
                     <span className="text-[11px] text-zinc-500 font-medium uppercase tracking-wider">
                       {stat.label}
                     </span>
                   </div>
-                  <p className="text-xl font-semibold text-zinc-100 tracking-tight font-mono">
+                  <p className="text-xl font-semibold text-zinc-100 tracking-tight font-mono tabular-nums">
                     {stat.value}
                   </p>
                 </div>
@@ -229,11 +231,11 @@ export function SiteDetailPanel({
 
             {/* Uptime History */}
             {uptimeHistory && uptimeHistory.totalChecks > 0 && (
-              <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-4 space-y-3">
+              <div className="rounded-xl border border-zinc-800/40 bg-zinc-900/20 p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-zinc-300">Uptime</h3>
                   <span
-                    className={`text-base font-mono font-bold ${
+                    className={`text-base font-mono font-bold tabular-nums ${
                       uptimeHistory.uptimePercentage >= 99.5
                         ? "text-emerald-400"
                         : uptimeHistory.uptimePercentage >= 95
@@ -249,34 +251,38 @@ export function SiteDetailPanel({
                     <div
                       key={i}
                       className={`h-5 flex-1 rounded-[2px] ${
-                        check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+                        check.status === "up" ? "bg-emerald-500/60" : "bg-red-500/70 uptime-incident"
                       }`}
                       title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}`}
                     />
                   ))}
                 </div>
-                <div className="flex items-center gap-4 text-[11px] text-zinc-500">
+                <div className="flex items-center gap-4 text-[11px] text-zinc-500 font-mono">
                   <span>{uptimeHistory.totalChecks} checks</span>
+                  <span className="text-zinc-700">|</span>
                   <span>{uptimeHistory.totalDown} incidents</span>
                   {uptimeHistory.lastIncident && (
-                    <span>Last: {new Date(uptimeHistory.lastIncident).toLocaleDateString()}</span>
+                    <>
+                      <span className="text-zinc-700">|</span>
+                      <span>Last: {new Date(uptimeHistory.lastIncident).toLocaleDateString()}</span>
+                    </>
                   )}
                 </div>
               </div>
             )}
 
             {/* Visitors chart */}
-            <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">
-              <div className="flex items-center justify-between px-4 pt-4">
+            <div className="rounded-xl border border-zinc-800/40 bg-zinc-900/20 overflow-hidden">
+              <div className="flex items-center justify-between px-5 pt-5">
                 <h3 className="text-sm font-medium text-zinc-300">Visitors</h3>
-                <div className="flex items-center gap-0.5 rounded-md bg-zinc-800/60 p-0.5">
+                <div className="flex items-center gap-0.5 rounded-lg bg-zinc-800/40 p-0.5 border border-zinc-800/40">
                   {ranges.map((r) => (
                     <button
                       key={r.value}
                       onClick={() => setDateRange(r.value)}
-                      className={`rounded px-2.5 py-1 text-[11px] font-mono font-medium transition-colors ${
+                      className={`rounded-md px-3 py-1 text-[11px] font-mono font-medium transition-all ${
                         dateRange === r.value
-                          ? "bg-zinc-700 text-zinc-100"
+                          ? "bg-zinc-700/80 text-zinc-100 shadow-sm"
                           : "text-zinc-500 hover:text-zinc-300"
                       }`}
                     >
@@ -285,7 +291,7 @@ export function SiteDetailPanel({
                   ))}
                 </div>
               </div>
-              <div className={`p-4 pt-2 ${loadingRange ? "opacity-50" : ""} transition-opacity`}>
+              <div className={`p-5 pt-3 ${loadingRange ? "opacity-40" : ""} transition-opacity duration-300`}>
                 <AnalyticsChart
                   data={analytics}
                   metric="visitors"
@@ -298,11 +304,11 @@ export function SiteDetailPanel({
 
             {/* Secondary charts */}
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">
-                <div className="px-4 pt-4">
+              <div className="rounded-xl border border-zinc-800/40 bg-zinc-900/20 overflow-hidden">
+                <div className="px-5 pt-5">
                   <h3 className="text-sm font-medium text-zinc-300">Page Views</h3>
                 </div>
-                <div className={`p-4 pt-2 ${loadingRange ? "opacity-50" : ""} transition-opacity`}>
+                <div className={`p-5 pt-3 ${loadingRange ? "opacity-40" : ""} transition-opacity duration-300`}>
                   <AnalyticsChart
                     data={analytics}
                     metric="pageViews"
@@ -312,11 +318,11 @@ export function SiteDetailPanel({
                   />
                 </div>
               </div>
-              <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">
-                <div className="px-4 pt-4">
+              <div className="rounded-xl border border-zinc-800/40 bg-zinc-900/20 overflow-hidden">
+                <div className="px-5 pt-5">
                   <h3 className="text-sm font-medium text-zinc-300">Bandwidth</h3>
                 </div>
-                <div className={`p-4 pt-2 ${loadingRange ? "opacity-50" : ""} transition-opacity`}>
+                <div className={`p-5 pt-3 ${loadingRange ? "opacity-40" : ""} transition-opacity duration-300`}>
                   <AnalyticsChart
                     data={analytics}
                     metric="bandwidth"
@@ -330,13 +336,13 @@ export function SiteDetailPanel({
 
             {/* Deployments */}
             {deployments.length > 0 && (
-              <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">
-                <div className="px-4 pt-4 pb-2">
+              <div className="rounded-xl border border-zinc-800/40 bg-zinc-900/20 overflow-hidden">
+                <div className="px-5 pt-5 pb-3">
                   <h3 className="text-sm font-medium text-zinc-300">
                     Recent Deployments
                   </h3>
                 </div>
-                <div className="px-4 pb-4 space-y-1.5">
+                <div className="px-5 pb-5 space-y-1.5">
                   {deployments.map((dep) => {
                     const lastStage = dep.stages[dep.stages.length - 1];
                     const isSuccess = lastStage?.status === "success";
@@ -345,9 +351,9 @@ export function SiteDetailPanel({
                     return (
                       <div
                         key={dep.id}
-                        className="flex items-center justify-between rounded-md bg-zinc-800/30 px-3.5 py-2.5 hover:bg-zinc-800/50 transition-colors"
+                        className="flex items-center justify-between rounded-lg bg-zinc-800/20 border border-zinc-800/30 px-4 py-3 hover:bg-zinc-800/40 transition-colors"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="flex items-center gap-3 min-w-0">
                           <GitBranch className="h-3.5 w-3.5 text-zinc-600 shrink-0" />
                           <div className="min-w-0">
                             <p className="text-[13px] text-zinc-300 truncate">
@@ -363,10 +369,10 @@ export function SiteDetailPanel({
                           <Badge
                             className={`text-[10px] font-mono ${
                               isSuccess
-                                ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/40"
+                                ? "bg-emerald-950/30 text-emerald-400 border-emerald-900/30"
                                 : isFailed
-                                ? "bg-red-950/40 text-red-400 border-red-900/40"
-                                : "bg-amber-950/40 text-amber-400 border-amber-900/40"
+                                ? "bg-red-950/30 text-red-400 border-red-900/30"
+                                : "bg-amber-950/30 text-amber-400 border-amber-900/30"
                             }`}
                           >
                             {isSuccess ? "Success" : isFailed ? "Failed" : "Building"}

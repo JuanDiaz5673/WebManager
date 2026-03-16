@@ -32,10 +32,10 @@ export function StatsOverview({ analyticsArray }: StatsOverviewProps) {
   );
 
   const stats = [
-    { label: "Total Visitors", value: formatNumber(totals.visitors), icon: Users },
-    { label: "Page Views", value: formatNumber(totals.pageViews), icon: Eye },
-    { label: "Requests", value: formatNumber(totals.requests), icon: Activity },
-    { label: "Bandwidth", value: formatBytes(totals.bandwidth), icon: HardDrive },
+    { label: "Total Visitors", value: formatNumber(totals.visitors), icon: Users, accent: "text-blue-400", bg: "bg-blue-500/5", border: "border-blue-500/10" },
+    { label: "Page Views", value: formatNumber(totals.pageViews), icon: Eye, accent: "text-amber-400", bg: "bg-amber-500/5", border: "border-amber-500/10" },
+    { label: "Requests", value: formatNumber(totals.requests), icon: Activity, accent: "text-violet-400", bg: "bg-violet-500/5", border: "border-violet-500/10" },
+    { label: "Bandwidth", value: formatBytes(totals.bandwidth), icon: HardDrive, accent: "text-emerald-400", bg: "bg-emerald-500/5", border: "border-emerald-500/10" },
   ];
 
   return (
@@ -43,12 +43,14 @@ export function StatsOverview({ analyticsArray }: StatsOverviewProps) {
       {stats.map((stat, i) => (
         <div
           key={stat.label}
-          className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 p-4 animate-in-view"
+          className={`relative rounded-xl border ${stat.border} ${stat.bg} p-4 animate-in-view overflow-hidden`}
           style={{ animationDelay: `${i * 0.05}s` }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <stat.icon className="h-3.5 w-3.5 text-zinc-500" />
-            <span className="text-xs text-zinc-500 font-medium">
+            <div className={`flex h-6 w-6 items-center justify-center rounded-md ${stat.bg} border ${stat.border}`}>
+              <stat.icon className={`h-3 w-3 ${stat.accent}`} />
+            </div>
+            <span className="text-[11px] text-zinc-500 font-medium tracking-wide uppercase">
               {stat.label}
             </span>
           </div>

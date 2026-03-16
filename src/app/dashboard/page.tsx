@@ -140,7 +140,7 @@ export default function DashboardPage() {
             <div
               key={site.project.id}
               className="animate-in-view"
-              style={{ maxWidth: "100vw", animationDelay: `${0.1 + i * 0.05}s` }}
+              style={{ animationDelay: `${0.1 + i * 0.05}s` }}
             >
               <SiteCard
                 project={site.project}
