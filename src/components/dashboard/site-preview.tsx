@@ -65,6 +65,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
           <iframe
             src={url}
             title={`Preview of ${projectName}`}
+            scrolling="no"
             style={{
               width: IFRAME_W,
               height: scrollable ? "100%" : IFRAME_H,
@@ -72,6 +73,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
               transformOrigin: "top left",
               pointerEvents: allowInteraction ? "auto" : "none",
               border: "none",
+              overflow: "hidden",
             }}
             onError={() => setUseFallback(true)}
           />
