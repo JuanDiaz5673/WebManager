@@ -40,7 +40,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
   const allowInteraction = scrollable && interacting;
 
   // For cards: cap preview height so it doesn't dominate the card
-  const maxCardHeight = isMobile ? 120 : 160;
+  const maxCardHeight = isMobile ? 160 : 200;
   const scaledHeight = scrollable ? undefined : Math.min(Math.round(IFRAME_H * scale), maxCardHeight);
 
   return (
