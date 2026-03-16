@@ -10,7 +10,10 @@ interface SitePreviewProps {
   className?: string;
 }
 
-export function SitePreview({ projectName, url, scrollable = false, className = "aspect-[16/9]" }: SitePreviewProps) {
+const IFRAME_W = 1280;
+const IFRAME_H = 720;
+
+export function SitePreview({ projectName, url, scrollable = false, className }: SitePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
   const [useFallback, setUseFallback] = useState(false);
@@ -23,7 +26,7 @@ export function SitePreview({ projectName, url, scrollable = false, className = 
 
     const observer = new ResizeObserver(([entry]) => {
       const width = entry.contentRect.width;
-      setScale(width / 1280);
+      setScale(width / IFRAME_W);
       setIsMobile(width < 500);
     });
     observer.observe(el);
@@ -36,10 +39,14 @@ export function SitePreview({ projectName, url, scrollable = false, className = 
   // For scrollable (detail) mode, require click to interact
   const allowInteraction = scrollable && interacting;
 
+  // The scaled height the iframe will visually occupy
+  const scaledHeight = scrollable ? undefined : Math.round(IFRAME_H * scale);
+
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden bg-zinc-900 ${className}`}
+      className={`relative w-full overflow-hidden bg-zinc-900 ${className ?? ""}`}
+      style={scaledHeight ? { height: scaledHeight } : undefined}
     >
       {showThumbnail ? (
         /* PNG thumbnail fallback */
@@ -58,8 +65,8 @@ export function SitePreview({ projectName, url, scrollable = false, className = 
             src={url}
             title={`Preview of ${projectName}`}
             style={{
-              width: 1300,
-              height: scrollable ? "100%" : 768,
+              width: IFRAME_W,
+              height: scrollable ? "100%" : IFRAME_H,
               transform: `scale(${scale})`,
               transformOrigin: "top left",
               pointerEvents: allowInteraction ? "auto" : "none",
