@@ -135,11 +135,12 @@ export default function DashboardPage() {
       {/* Sites */}
       <div>
         <h3 className="text-sm font-medium text-zinc-400 mb-4">Sites</h3>
-        <div className="grid gap-3 lg:gap-4 lg:grid-cols-2 xl:grid-cols-3 max-w-[50%] lg:max-w-none">
+        <div className="grid gap-3 lg:gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {sites.map((site, i) => (
             <div
               key={site.project.id}
               className="animate-in-view"
+              style={{ maxWidth: "min(100%, 50vw)" }}
               style={{ animationDelay: `${0.1 + i * 0.05}s` }}
             >
               <SiteCard
