@@ -14,15 +14,73 @@ import {
   HardDrive,
   GitBranch,
   Clock,
+  AlertTriangle,
+  CheckCircle2,
+  Shield,
 } from "lucide-react";
-import { format, subDays, parseISO } from "date-fns";
+import { format, subDays, parseISO, formatDistanceStrict } from "date-fns";
 import type {
   PagesProject,
   PagesDeployment,
   AnalyticsData,
   UptimeStatus,
   UptimeHistory,
+  UptimeCheck,
 } from "@/types/cloudflare";
+
+interface Outage {
+  startedAt: string;
+  endedAt: string | null;
+  duration: number; // ms
+  checks: UptimeCheck[];
+}
+
+function getOutages(checks: UptimeCheck[]): Outage[] {
+  const outages: Outage[] = [];
+  let current: UptimeCheck[] | null = null;
+
+  for (const check of checks) {
+    if (check.status === "down") {
+      if (!current) current = [];
+      current.push(check);
+    } else if (current) {
+      const startedAt = current[0].checkedAt;
+      const endedAt = check.checkedAt;
+      outages.push({
+        startedAt,
+        endedAt,
+        duration: new Date(endedAt).getTime() - new Date(startedAt).getTime(),
+        checks: current,
+      });
+      current = null;
+    }
+  }
+
+  // If still down (ongoing outage)
+  if (current && current.length > 0) {
+    outages.push({
+      startedAt: current[0].checkedAt,
+      endedAt: null,
+      duration: Date.now() - new Date(current[0].checkedAt).getTime(),
+      checks: current,
+    });
+  }
+
+  return outages.reverse(); // newest first
+}
+
+function formatDuration(ms: number): string {
+  if (ms < 60_000) return "< 1 min";
+  if (ms < 3_600_000) return `${Math.round(ms / 60_000)} min`;
+  if (ms < 86_400_000) {
+    const h = Math.floor(ms / 3_600_000);
+    const m = Math.round((ms % 3_600_000) / 60_000);
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+  const d = Math.floor(ms / 86_400_000);
+  const h = Math.round((ms % 86_400_000) / 3_600_000);
+  return h > 0 ? `${d}d ${h}h` : `${d}d`;
+}
 
 type DateRange = "24h" | "7d" | "30d";
 
@@ -226,61 +284,165 @@ export default function SiteDetailPage() {
       </div>
 
       {/* Uptime History */}
-      {uptimeHistory && uptimeHistory.totalChecks > 0 && (
-        <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-300">Uptime History</h3>
-            <span
-              className={`text-lg font-mono font-bold ${
-                uptimeHistory.uptimePercentage >= 99.5
-                  ? "text-emerald-400"
-                  : uptimeHistory.uptimePercentage >= 95
-                  ? "text-amber-400"
-                  : "text-red-400"
-              }`}
-            >
-              {uptimeHistory.uptimePercentage.toFixed(2)}%
-            </span>
-          </div>
+      {uptimeHistory && uptimeHistory.totalChecks > 0 && (() => {
+        const outages = getOutages(uptimeHistory.checks);
+        const currentlyDown = outages.length > 0 && outages[0].endedAt === null;
+        const longestOutage = outages.length > 0
+          ? Math.max(...outages.map((o) => o.duration))
+          : 0;
+        const avgResponseTime = uptimeHistory.checks
+          .filter((c) => c.status === "up" && c.responseTime !== null)
+          .reduce((acc, c, _, arr) => acc + (c.responseTime ?? 0) / arr.length, 0);
 
-          {/* Full status bar */}
-          <div className="flex gap-[2px]">
-            {uptimeHistory.checks.slice(-90).map((check, i) => (
-              <div
-                key={i}
-                className={`h-6 flex-1 rounded-[2px] ${
-                  check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+        return (
+          <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden p-5 space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Shield className="h-4 w-4 text-zinc-500" />
+                <h3 className="text-sm font-medium text-zinc-300">Uptime Monitor</h3>
+              </div>
+              <span
+                className={`text-lg font-mono font-bold ${
+                  uptimeHistory.uptimePercentage >= 99.5
+                    ? "text-emerald-400"
+                    : uptimeHistory.uptimePercentage >= 95
+                    ? "text-amber-400"
+                    : "text-red-400"
                 }`}
-                title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}${
-                  check.responseTime ? ` (${check.responseTime}ms)` : ""
-                }`}
-              />
-            ))}
-          </div>
+              >
+                {uptimeHistory.uptimePercentage.toFixed(2)}%
+              </span>
+            </div>
 
-          {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
-              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Total Checks</p>
-              <p className="text-sm font-mono font-semibold text-zinc-200">{uptimeHistory.totalChecks}</p>
+            {/* Current status banner */}
+            {currentlyDown ? (
+              <div className="rounded-lg border border-red-900/50 bg-red-950/20 px-4 py-3 flex items-center gap-3">
+                <AlertTriangle className="h-4 w-4 text-red-400 shrink-0" />
+                <div>
+                  <p className="text-[13px] font-medium text-red-400">Site is currently down</p>
+                  <p className="text-[11px] text-red-400/60 mt-0.5">
+                    Since {format(parseISO(outages[0].startedAt), "MMM d, HH:mm")} ({formatDuration(outages[0].duration)})
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-emerald-900/40 bg-emerald-950/15 px-4 py-3 flex items-center gap-3">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                <div>
+                  <p className="text-[13px] font-medium text-emerald-400">All systems operational</p>
+                  {uptimeHistory.lastIncident && (
+                    <p className="text-[11px] text-emerald-400/60 mt-0.5">
+                      Last incident {formatDistanceStrict(parseISO(uptimeHistory.lastIncident), new Date(), { addSuffix: true })}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Status bar */}
+            <div className="flex gap-[2px]">
+              {uptimeHistory.checks.slice(-90).map((check, i) => (
+                <div
+                  key={i}
+                  className={`h-6 flex-1 rounded-[2px] ${
+                    check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+                  }`}
+                  title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}${
+                    check.responseTime ? ` (${check.responseTime}ms)` : ""
+                  }`}
+                />
+              ))}
             </div>
-            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
-              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Incidents</p>
-              <p className={`text-sm font-mono font-semibold ${uptimeHistory.totalDown > 0 ? "text-red-400" : "text-emerald-400"}`}>
-                {uptimeHistory.totalDown}
-              </p>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-4 gap-3">
+              <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+                <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Total Checks</p>
+                <p className="text-sm font-mono font-semibold text-zinc-200">{uptimeHistory.totalChecks}</p>
+              </div>
+              <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+                <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Outages</p>
+                <p className={`text-sm font-mono font-semibold ${outages.length > 0 ? "text-red-400" : "text-emerald-400"}`}>
+                  {outages.length}
+                </p>
+              </div>
+              <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+                <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Longest Outage</p>
+                <p className="text-sm font-mono font-semibold text-zinc-200">
+                  {longestOutage > 0 ? formatDuration(longestOutage) : "None"}
+                </p>
+              </div>
+              <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+                <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Avg Response</p>
+                <p className="text-sm font-mono font-semibold text-zinc-200">
+                  {avgResponseTime > 0 ? `${Math.round(avgResponseTime)}ms` : "—"}
+                </p>
+              </div>
             </div>
-            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
-              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Last Incident</p>
-              <p className="text-sm font-mono font-semibold text-zinc-200">
-                {uptimeHistory.lastIncident
-                  ? new Date(uptimeHistory.lastIncident).toLocaleDateString()
-                  : "None"}
-              </p>
-            </div>
+
+            {/* Outage log */}
+            {outages.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-[12px] font-medium text-zinc-500 uppercase tracking-wider">Outage Log</h4>
+                <div className="space-y-1.5">
+                  {outages.slice(0, 10).map((outage, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between rounded-md bg-zinc-800/30 px-4 py-3 hover:bg-zinc-800/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${outage.endedAt === null ? "text-red-400" : "text-amber-500"}`} />
+                        <div className="min-w-0">
+                          <p className="text-[13px] text-zinc-300">
+                            {outage.endedAt === null ? (
+                              <span className="text-red-400 font-medium">Ongoing</span>
+                            ) : (
+                              <>Down for <span className="font-mono font-medium">{formatDuration(outage.duration)}</span></>
+                            )}
+                          </p>
+                          <p className="text-[11px] text-zinc-600 mt-0.5">
+                            {format(parseISO(outage.startedAt), "MMM d, yyyy HH:mm")}
+                            {outage.endedAt && (
+                              <> — {format(parseISO(outage.endedAt), "HH:mm")}</>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[11px] font-mono text-zinc-600">
+                          {outage.checks.length} failed check{outage.checks.length !== 1 ? "s" : ""}
+                        </span>
+                        {outage.endedAt === null ? (
+                          <span className="inline-flex items-center rounded-full bg-red-950/40 border border-red-900/40 px-2 py-0.5 text-[10px] font-mono font-medium text-red-400">
+                            ACTIVE
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-zinc-800/60 border border-zinc-700/40 px-2 py-0.5 text-[10px] font-mono font-medium text-zinc-500">
+                            RESOLVED
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {outages.length > 10 && (
+                    <p className="text-[11px] text-zinc-600 text-center py-1">
+                      + {outages.length - 10} more outages
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* No outages message */}
+            {outages.length === 0 && (
+              <div className="text-center py-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500/50 mx-auto mb-2" />
+                <p className="text-[12px] text-zinc-600">No outages recorded</p>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Main chart */}
       <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">
