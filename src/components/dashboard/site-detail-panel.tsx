@@ -176,8 +176,8 @@ export function SiteDetailPanel({
         >
           {/* Preview banner */}
           <div className="relative overflow-hidden sm:rounded-t-xl">
-            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[400px] sm:h-[500px] md:h-[560px]" />
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
+            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[280px] sm:h-[400px] md:h-[560px]" />
+            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
 
             {/* Header overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-5 flex items-end justify-between">
