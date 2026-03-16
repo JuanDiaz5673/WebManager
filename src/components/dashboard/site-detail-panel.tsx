@@ -177,34 +177,33 @@ export function SiteDetailPanel({
           {/* Preview banner */}
           <div className="relative overflow-hidden sm:rounded-t-xl">
             <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[280px] sm:h-[400px] md:h-[560px]" />
-            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
-
-            {/* Header overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-5 flex items-end justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">
-                  {project.name}
-                </h2>
-                <a
-                  href={primaryUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors mt-0.5"
-                >
-                  {domain}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-              <UptimeBadge status={uptime} />
-            </div>
 
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900/80 border border-zinc-700/50 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors backdrop-blur-sm"
+              className="absolute top-3 right-3 z-30 flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900/80 border border-zinc-700/50 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors backdrop-blur-sm"
             >
               <X className="h-4 w-4" />
             </button>
+          </div>
+
+          {/* Header — below preview */}
+          <div className="px-3.5 sm:px-5 pt-3 pb-1 flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">
+                {project.name}
+              </h2>
+              <a
+                href={primaryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors mt-0.5"
+              >
+                {domain}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <UptimeBadge status={uptime} />
           </div>
 
           <div className="p-3.5 sm:p-5 space-y-4 sm:space-y-5">
