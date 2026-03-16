@@ -4,7 +4,7 @@ import { ExternalLink, Users, Eye, Activity, HardDrive, ChevronRight } from "luc
 import { SitePreview } from "./site-preview";
 import { UptimeBadge } from "./uptime-badge";
 import { MiniSparkline } from "./analytics-chart";
-import type { PagesProject, AnalyticsData, UptimeStatus } from "@/types/cloudflare";
+import type { PagesProject, AnalyticsData, UptimeStatus, UptimeHistory } from "@/types/cloudflare";
 
 function formatNumber(n: number): string {
   if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
@@ -23,6 +23,7 @@ interface SiteCardProps {
   project: PagesProject;
   analytics: AnalyticsData;
   uptime: UptimeStatus;
+  uptimeHistory?: UptimeHistory;
   onExpand: () => void;
 }
 
@@ -31,7 +32,63 @@ function getCustomDomain(project: PagesProject): string {
   return custom || project.domains[0] || project.subdomain;
 }
 
-export function SiteCard({ project, analytics, uptime, onExpand }: SiteCardProps) {
+function UptimeBar({ history }: { history?: UptimeHistory }) {
+  if (!history || history.totalChecks === 0) {
+    return (
+      <div className="rounded-md bg-zinc-800/30 px-3 py-2.5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider">Uptime</span>
+          <span className="text-[10px] text-zinc-600 font-mono">No data</span>
+        </div>
+        <div className="flex gap-[2px]">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div key={i} className="h-4 flex-1 rounded-[2px] bg-zinc-800/60" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Show last 30 time slots
+  const recentChecks = history.checks.slice(-30);
+  const pct = history.uptimePercentage;
+  const color = pct >= 99.5 ? "text-emerald-400" : pct >= 95 ? "text-amber-400" : "text-red-400";
+
+  return (
+    <div className="rounded-md bg-zinc-800/30 px-3 py-2.5">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider">Uptime</span>
+        <span className={`text-[11px] font-mono font-semibold ${color}`}>
+          {pct.toFixed(2)}%
+        </span>
+      </div>
+      <div className="flex gap-[2px]">
+        {Array.from({ length: 30 }).map((_, i) => {
+          const check = recentChecks[i];
+          if (!check) {
+            return <div key={i} className="h-4 flex-1 rounded-[2px] bg-zinc-800/60" />;
+          }
+          return (
+            <div
+              key={i}
+              className={`h-4 flex-1 rounded-[2px] ${
+                check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+              }`}
+              title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}`}
+            />
+          );
+        })}
+      </div>
+      {history.lastIncident && (
+        <p className="text-[10px] text-zinc-600 mt-1.5">
+          Last incident: {new Date(history.lastIncident).toLocaleDateString()}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }: SiteCardProps) {
   const domain = getCustomDomain(project);
   const primaryUrl = `https://${domain}`;
 
@@ -87,6 +144,9 @@ export function SiteCard({ project, analytics, uptime, onExpand }: SiteCardProps
             </div>
           ))}
         </div>
+
+        {/* Uptime history bar */}
+        <UptimeBar history={uptimeHistory} />
 
         {/* Sparkline */}
         <div className="pt-1">

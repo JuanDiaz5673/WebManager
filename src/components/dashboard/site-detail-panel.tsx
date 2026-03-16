@@ -21,6 +21,7 @@ import type {
   PagesDeployment,
   AnalyticsData,
   UptimeStatus,
+  UptimeHistory,
 } from "@/types/cloudflare";
 
 type DateRange = "24h" | "7d" | "30d";
@@ -59,6 +60,7 @@ interface SiteDetailPanelProps {
   project: PagesProject & { recent_deployments?: PagesDeployment[] };
   analytics: AnalyticsData;
   uptime: UptimeStatus;
+  uptimeHistory?: UptimeHistory;
   onClose: () => void;
 }
 
@@ -66,6 +68,7 @@ export function SiteDetailPanel({
   project,
   analytics: initialAnalytics,
   uptime,
+  uptimeHistory,
   onClose,
 }: SiteDetailPanelProps) {
   const [dateRange, setDateRange] = useState<DateRange>("7d");
@@ -224,6 +227,44 @@ export function SiteDetailPanel({
                 </div>
               ))}
             </div>
+
+            {/* Uptime History */}
+            {uptimeHistory && uptimeHistory.totalChecks > 0 && (
+              <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-zinc-300">Uptime</h3>
+                  <span
+                    className={`text-base font-mono font-bold ${
+                      uptimeHistory.uptimePercentage >= 99.5
+                        ? "text-emerald-400"
+                        : uptimeHistory.uptimePercentage >= 95
+                        ? "text-amber-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {uptimeHistory.uptimePercentage.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex gap-[2px]">
+                  {uptimeHistory.checks.slice(-60).map((check, i) => (
+                    <div
+                      key={i}
+                      className={`h-5 flex-1 rounded-[2px] ${
+                        check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+                      }`}
+                      title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}`}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-4 text-[11px] text-zinc-500">
+                  <span>{uptimeHistory.totalChecks} checks</span>
+                  <span>{uptimeHistory.totalDown} incidents</span>
+                  {uptimeHistory.lastIncident && (
+                    <span>Last: {new Date(uptimeHistory.lastIncident).toLocaleDateString()}</span>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Visitors chart */}
             <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">

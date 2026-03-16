@@ -4,12 +4,13 @@ import { useEffect, useState, useCallback } from "react";
 import { SiteCard } from "@/components/dashboard/site-card";
 import { SiteDetailPanel } from "@/components/dashboard/site-detail-panel";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
-import type { PagesProject, PagesDeployment, AnalyticsData, UptimeStatus } from "@/types/cloudflare";
+import type { PagesProject, PagesDeployment, AnalyticsData, UptimeStatus, UptimeHistory } from "@/types/cloudflare";
 
 interface SiteWithData {
   project: PagesProject & { recent_deployments?: PagesDeployment[] };
   analytics: AnalyticsData;
   uptime: UptimeStatus;
+  uptimeHistory?: UptimeHistory;
 }
 
 const emptyAnalytics: AnalyticsData = {
@@ -40,7 +41,7 @@ export default function DashboardPage() {
       const data = await res.json();
 
       const sitesData: SiteWithData[] = (data.sites ?? []).map(
-        (s: { project: PagesProject & { recent_deployments?: PagesDeployment[] }; analytics?: AnalyticsData; uptime?: UptimeStatus }) => ({
+        (s: { project: PagesProject & { recent_deployments?: PagesDeployment[] }; analytics?: AnalyticsData; uptime?: UptimeStatus; uptimeHistory?: UptimeHistory }) => ({
           project: s.project,
           analytics: s.analytics ?? emptyAnalytics,
           uptime: s.uptime ?? {
@@ -50,6 +51,7 @@ export default function DashboardPage() {
             responseTime: null,
             checkedAt: new Date().toISOString(),
           },
+          uptimeHistory: s.uptimeHistory,
         })
       );
 
@@ -144,6 +146,7 @@ export default function DashboardPage() {
                 project={site.project}
                 analytics={site.analytics}
                 uptime={site.uptime}
+                uptimeHistory={site.uptimeHistory}
                 onExpand={() => setExpandedIndex(i)}
               />
             </div>
@@ -157,6 +160,7 @@ export default function DashboardPage() {
           project={sites[expandedIndex].project}
           analytics={sites[expandedIndex].analytics}
           uptime={sites[expandedIndex].uptime}
+          uptimeHistory={sites[expandedIndex].uptimeHistory}
           onClose={() => setExpandedIndex(null)}
         />
       )}

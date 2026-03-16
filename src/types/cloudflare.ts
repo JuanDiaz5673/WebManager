@@ -56,10 +56,28 @@ export interface UptimeStatus {
   checkedAt: string;
 }
 
+export interface UptimeCheck {
+  status: "up" | "down";
+  statusCode: number | null;
+  responseTime: number | null;
+  checkedAt: string;
+}
+
+export interface UptimeHistory {
+  url: string;
+  checks: UptimeCheck[];
+  uptimePercentage: number;
+  totalChecks: number;
+  totalUp: number;
+  totalDown: number;
+  lastIncident: string | null;
+}
+
 export interface SiteData {
   project: PagesProject;
   analytics: AnalyticsData;
   uptime: UptimeStatus;
+  uptimeHistory?: UptimeHistory;
 }
 
 export interface CloudflareAPIResponse<T> {

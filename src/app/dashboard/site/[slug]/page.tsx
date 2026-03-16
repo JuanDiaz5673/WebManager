@@ -21,6 +21,7 @@ import type {
   PagesDeployment,
   AnalyticsData,
   UptimeStatus,
+  UptimeHistory,
 } from "@/types/cloudflare";
 
 type DateRange = "24h" | "7d" | "30d";
@@ -60,6 +61,7 @@ export default function SiteDetailPage() {
   >();
   const [analytics, setAnalytics] = useState<AnalyticsData>(emptyAnalytics);
   const [uptime, setUptime] = useState<UptimeStatus>();
+  const [uptimeHistory, setUptimeHistory] = useState<UptimeHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>("7d");
 
@@ -95,14 +97,18 @@ export default function SiteDetailPage() {
             .catch(() => emptyAnalytics)
         : Promise.resolve(emptyAnalytics);
 
-      const [analyticsData, uptimeData] = await Promise.all([
+      const [analyticsData, uptimeData, historyData] = await Promise.all([
         analyticsPromise,
         fetch(`/api/uptime?urls=${encodeURIComponent(primaryUrl)}`)
           .then((r) => (r.ok ? r.json() : { results: [] }))
           .catch(() => ({ results: [] })),
+        fetch(`/api/uptime-history?site=${encodeURIComponent(slug)}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
       ]);
 
       setAnalytics(analyticsData);
+      setUptimeHistory(historyData);
       setUptime(
         uptimeData.results?.[0] ?? {
           url: primaryUrl,
@@ -218,6 +224,63 @@ export default function SiteDetailPage() {
           </div>
         ))}
       </div>
+
+      {/* Uptime History */}
+      {uptimeHistory && uptimeHistory.totalChecks > 0 && (
+        <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-zinc-300">Uptime History</h3>
+            <span
+              className={`text-lg font-mono font-bold ${
+                uptimeHistory.uptimePercentage >= 99.5
+                  ? "text-emerald-400"
+                  : uptimeHistory.uptimePercentage >= 95
+                  ? "text-amber-400"
+                  : "text-red-400"
+              }`}
+            >
+              {uptimeHistory.uptimePercentage.toFixed(2)}%
+            </span>
+          </div>
+
+          {/* Full status bar */}
+          <div className="flex gap-[2px]">
+            {uptimeHistory.checks.slice(-90).map((check, i) => (
+              <div
+                key={i}
+                className={`h-6 flex-1 rounded-[2px] ${
+                  check.status === "up" ? "bg-emerald-500/70" : "bg-red-500/70"
+                }`}
+                title={`${check.status === "up" ? "Up" : "Down"} — ${new Date(check.checkedAt).toLocaleString()}${
+                  check.responseTime ? ` (${check.responseTime}ms)` : ""
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Total Checks</p>
+              <p className="text-sm font-mono font-semibold text-zinc-200">{uptimeHistory.totalChecks}</p>
+            </div>
+            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Incidents</p>
+              <p className={`text-sm font-mono font-semibold ${uptimeHistory.totalDown > 0 ? "text-red-400" : "text-emerald-400"}`}>
+                {uptimeHistory.totalDown}
+              </p>
+            </div>
+            <div className="rounded-md bg-zinc-800/30 px-3 py-2">
+              <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Last Incident</p>
+              <p className="text-sm font-mono font-semibold text-zinc-200">
+                {uptimeHistory.lastIncident
+                  ? new Date(uptimeHistory.lastIncident).toLocaleDateString()
+                  : "None"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main chart */}
       <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 overflow-hidden">

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getProjects, getDeployments, getZones, checkUptime } from "@/lib/cloudflare-api";
 import { getZoneAnalytics } from "@/lib/cloudflare-graphql";
+import { getUptimeHistory, storeUptimeCheck } from "@/lib/uptime-kv";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { format, subDays } from "date-fns";
 import type { AnalyticsData } from "@/types/cloudflare";
 
@@ -53,6 +55,15 @@ export async function GET() {
     const since = format(subDays(new Date(), 7), "yyyy-MM-dd");
     const until = format(new Date(), "yyyy-MM-dd");
 
+    // Get KV binding for uptime history (optional — works without it)
+    let kv: CloudflareEnv["UPTIME_KV"];
+    try {
+      const { env } = getCloudflareContext();
+      kv = env.UPTIME_KV;
+    } catch {
+      // KV not available (e.g., local dev)
+    }
+
     // Step 2: For each project, fetch deployments + analytics + uptime in parallel
     const sitesData = await Promise.all(
       projects.map(async (project) => {
@@ -70,8 +81,8 @@ export async function GET() {
           }
         }
 
-        // Fetch all three in parallel per site
-        const [deployments, analytics, uptime] = await Promise.all([
+        // Fetch all data in parallel per site
+        const [deployments, analytics, uptime, uptimeHistory] = await Promise.all([
           getDeployments(accountId, apiToken, project.name, 5).catch(() => []),
           zoneId
             ? getZoneAnalytics(apiToken, zoneId, since, until).catch(() => emptyAnalytics)
@@ -83,12 +94,24 @@ export async function GET() {
             responseTime: null,
             checkedAt: new Date().toISOString(),
           })),
+          kv ? getUptimeHistory(kv, project.name).catch(() => null) : Promise.resolve(null),
         ]);
+
+        // Also store this check in KV for history tracking
+        if (kv && uptime.status !== "unknown") {
+          storeUptimeCheck(kv, project.name, primaryUrl, {
+            status: uptime.status,
+            statusCode: uptime.statusCode,
+            responseTime: uptime.responseTime,
+            checkedAt: uptime.checkedAt,
+          }).catch(() => {});
+        }
 
         return {
           project: { ...project, recent_deployments: deployments },
           analytics,
           uptime,
+          uptimeHistory,
         };
       })
     );
