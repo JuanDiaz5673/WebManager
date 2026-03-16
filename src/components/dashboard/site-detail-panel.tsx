@@ -186,8 +186,8 @@ export function SiteDetailPanel({
           <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[300px] sm:h-[420px] md:h-[540px] sm:rounded-t-2xl overflow-hidden" />
 
           {/* Header — below preview */}
-          <div className="px-4 sm:px-6 pt-5 pb-2 flex items-start justify-between">
-            <div className="pb-4">
+          <div className="px-4 sm:px-6 pt-3 pb-2 flex items-start justify-between">
+            <div className="pb-2">
               <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">
                 {project.name}
               </h2>
