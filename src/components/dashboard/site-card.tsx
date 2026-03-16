@@ -104,12 +104,10 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
       onClick={onExpand}
       className="cursor-pointer group rounded-lg border border-zinc-800/80 bg-zinc-900/30 hover:bg-zinc-900/60 hover:border-zinc-700/80 transition-colors overflow-hidden"
     >
-      {/* Site Preview — hidden on mobile for compact cards */}
-      <div className="hidden sm:block">
-        <SitePreview projectName={project.name} url={primaryUrl} />
-      </div>
+      {/* Site Preview */}
+      <SitePreview projectName={project.name} url={primaryUrl} />
 
-      <div className="p-3.5 sm:p-5 space-y-3 sm:space-y-4">
+      <div className="p-3 sm:p-5 space-y-2.5 sm:space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -130,17 +128,17 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
           <UptimeBadge status={uptime} />
         </div>
 
-        {/* Metrics grid */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Metrics — inline row on mobile, 2x2 grid on desktop */}
+        <div className="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-3">
           {metrics.map((m) => (
-            <div key={m.label} className="rounded-md bg-zinc-800/30 px-3 py-2">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <m.icon className="h-3 w-3 text-zinc-600" />
-                <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider">
+            <div key={m.label} className="rounded-md bg-zinc-800/30 px-2 py-1.5 sm:px-3 sm:py-2">
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5">
+                <m.icon className="h-3 w-3 text-zinc-600 hidden sm:block" />
+                <span className="text-[9px] sm:text-[10px] text-zinc-600 font-medium uppercase tracking-wider">
                   {m.label}
                 </span>
               </div>
-              <p className="text-sm font-mono font-semibold text-zinc-200">
+              <p className="text-[12px] sm:text-sm font-mono font-semibold text-zinc-200">
                 {m.value}
               </p>
             </div>
@@ -150,8 +148,8 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
         {/* Uptime history bar */}
         <UptimeBar history={uptimeHistory} />
 
-        {/* Sparkline */}
-        <div className="pt-1">
+        {/* Sparkline — hidden on mobile */}
+        <div className="hidden sm:block pt-1">
           <MiniSparkline data={analytics} metric="visitors" color="#3b82f6" />
         </div>
 
