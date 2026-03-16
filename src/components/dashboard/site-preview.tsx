@@ -109,8 +109,8 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
         </>
       )}
 
-      {/* Fade-out gradient at the bottom */}
-      {!allowInteraction && (
+      {/* Fade-out gradient at the bottom — cards only */}
+      {!scrollable && (
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-zinc-950/90 to-transparent" />
       )}
 

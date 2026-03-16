@@ -174,18 +174,16 @@ export function SiteDetailPanel({
           className="relative w-full min-h-screen sm:min-h-0 max-w-5xl sm:rounded-2xl border-0 sm:border border-zinc-800/60 bg-[#0c0c0e] shadow-2xl shadow-black/60 animate-slide-up sm:animate-scale-in"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Preview banner */}
-          <div className="relative overflow-hidden sm:rounded-t-2xl">
-            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[280px] sm:h-[400px] md:h-[520px]" />
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-30 flex h-9 w-9 items-center justify-center rounded-xl bg-black/60 border border-white/10 text-zinc-400 hover:text-zinc-100 hover:bg-black/80 transition-all backdrop-blur-md"
+          >
+            <X className="h-4 w-4" />
+          </button>
 
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 z-30 flex h-9 w-9 items-center justify-center rounded-xl bg-black/60 border border-white/10 text-zinc-400 hover:text-zinc-100 hover:bg-black/80 transition-all backdrop-blur-md"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          {/* Preview */}
+          <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[300px] sm:h-[420px] md:h-[540px] sm:rounded-t-2xl overflow-hidden" />
 
           {/* Header — below preview */}
           <div className="px-4 sm:px-6 pt-5 pb-2 flex items-start justify-between border-b border-zinc-800/40 mb-1">
