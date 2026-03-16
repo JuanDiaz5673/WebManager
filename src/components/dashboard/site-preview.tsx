@@ -16,6 +16,7 @@ const IFRAME_H = 720;
 export function SitePreview({ projectName, url, scrollable = false, className }: SitePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
+  const [containerHeight, setContainerHeight] = useState(0);
   const [useFallback, setUseFallback] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [interacting, setInteracting] = useState(false);
@@ -28,6 +29,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
       const width = entry.contentRect.width;
       setScale(width / IFRAME_W);
       setIsMobile(width < 500);
+      setContainerHeight(entry.contentRect.height);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -68,7 +70,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
             scrolling="no"
             style={{
               width: IFRAME_W,
-              height: scrollable ? "100%" : IFRAME_H,
+              height: scrollable && containerHeight && scale ? Math.round(containerHeight / scale) : IFRAME_H,
               transform: `scale(${scale})`,
               transformOrigin: "top left",
               pointerEvents: allowInteraction ? "auto" : "none",
