@@ -22,6 +22,7 @@
 
 # misc
 .DS_Store
+CLAUDE.md
 *.pem
 
 # debug
@@ -39,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# cloudflare
+.open-next/
+.wrangler/
