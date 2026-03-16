@@ -39,8 +39,9 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
   // For scrollable (detail) mode, require click to interact
   const allowInteraction = scrollable && interacting;
 
-  // The scaled height the iframe will visually occupy
-  const scaledHeight = scrollable ? undefined : Math.round(IFRAME_H * scale);
+  // For cards: cap preview height so it doesn't dominate the card
+  const maxCardHeight = isMobile ? 120 : 160;
+  const scaledHeight = scrollable ? undefined : Math.min(Math.round(IFRAME_H * scale), maxCardHeight);
 
   return (
     <div
