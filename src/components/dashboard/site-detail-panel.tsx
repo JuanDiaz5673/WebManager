@@ -169,7 +169,7 @@ export function SiteDetailPanel({
       />
 
       {/* Panel */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-0 px-0 sm:py-6 sm:px-4 md:py-10">
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto pt-14 pb-0 px-0 sm:pt-6 sm:pb-6 sm:px-4 md:pt-10 md:pb-10">
         <div
           className="relative w-full min-h-screen sm:min-h-0 max-w-5xl sm:rounded-2xl border-0 sm:border border-zinc-800/60 bg-[#0c0c0e] shadow-2xl shadow-black/60 animate-slide-up sm:animate-scale-in"
           onClick={(e) => e.stopPropagation()}
