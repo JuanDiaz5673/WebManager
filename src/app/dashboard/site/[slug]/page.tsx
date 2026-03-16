@@ -355,7 +355,7 @@ export default function SiteDetailPage() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <div className="rounded-md bg-zinc-800/30 px-3 py-2">
                 <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mb-0.5">Total Checks</p>
                 <p className="text-sm font-mono font-semibold text-zinc-200">{uptimeHistory.totalChecks}</p>
@@ -388,7 +388,7 @@ export default function SiteDetailPage() {
                   {outages.slice(0, 10).map((outage, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between rounded-md bg-zinc-800/30 px-4 py-3 hover:bg-zinc-800/50 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md bg-zinc-800/30 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-zinc-800/50 transition-colors"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${outage.endedAt === null ? "text-red-400" : "text-amber-500"}`} />
@@ -408,7 +408,7 @@ export default function SiteDetailPage() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 pl-6 sm:pl-0">
                         <span className="text-[11px] font-mono text-zinc-600">
                           {outage.checks.length} failed check{outage.checks.length !== 1 ? "s" : ""}
                         </span>

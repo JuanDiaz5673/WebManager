@@ -107,7 +107,7 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
       {/* Site Preview */}
       <SitePreview projectName={project.name} url={primaryUrl} />
 
-      <div className="p-5 space-y-4">
+      <div className="p-3.5 sm:p-5 space-y-3 sm:space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">

@@ -169,18 +169,18 @@ export function SiteDetailPanel({
       />
 
       {/* Panel */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-8 px-4 md:py-12">
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-0 px-0 sm:py-8 sm:px-4 md:py-12">
         <div
-          className="relative w-full max-w-5xl rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/50 animate-scale-in"
+          className="relative w-full min-h-screen sm:min-h-0 max-w-5xl sm:rounded-xl border-0 sm:border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/50 animate-scale-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Preview banner */}
-          <div className="relative overflow-hidden rounded-t-xl">
-            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[560px]" />
+          <div className="relative overflow-hidden sm:rounded-t-xl">
+            <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[240px] sm:h-[400px] md:h-[560px]" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent pointer-events-none" />
 
             {/* Header overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
+            <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-5 flex items-end justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">
                   {project.name}
@@ -207,9 +207,9 @@ export function SiteDetailPanel({
             </button>
           </div>
 
-          <div className="p-5 space-y-5">
+          <div className="p-3.5 sm:p-5 space-y-4 sm:space-y-5">
             {/* Stats row */}
-            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
               {statCards.map((stat) => (
                 <div
                   key={stat.label}
