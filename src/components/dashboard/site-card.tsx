@@ -128,12 +128,12 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
           <UptimeBadge status={uptime} />
         </div>
 
-        {/* Metrics — inline row on mobile, 2x2 grid on desktop */}
-        <div className="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-3">
+        {/* Metrics grid */}
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
           {metrics.map((m) => (
             <div key={m.label} className="rounded-md bg-zinc-800/30 px-2 py-1.5 sm:px-3 sm:py-2">
               <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5">
-                <m.icon className="h-3 w-3 text-zinc-600 hidden sm:block" />
+                <m.icon className="h-3 w-3 text-zinc-600" />
                 <span className="text-[9px] sm:text-[10px] text-zinc-600 font-medium uppercase tracking-wider">
                   {m.label}
                 </span>
