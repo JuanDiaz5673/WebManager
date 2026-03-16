@@ -135,7 +135,7 @@ export default function DashboardPage() {
       {/* Sites */}
       <div>
         <h3 className="text-sm font-medium text-zinc-400 mb-4">Sites</h3>
-        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-[50%] sm:max-w-none">
           {sites.map((site, i) => (
             <div
               key={site.project.id}
