@@ -99,7 +99,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
                 e.stopPropagation();
                 setInteracting(false);
               }}
-              className="absolute top-2 right-14 z-20 rounded-md bg-zinc-900/80 border border-zinc-700/50 px-2.5 py-1 text-[11px] font-medium text-zinc-400 hover:text-zinc-200 backdrop-blur-sm transition-colors"
+              className="absolute top-3 right-14 z-20 flex h-9 items-center justify-center rounded-xl bg-black/60 border border-white/10 px-3 text-[11px] font-medium text-zinc-400 hover:text-zinc-100 hover:bg-black/80 backdrop-blur-md transition-all"
             >
               Stop interacting
             </button>
