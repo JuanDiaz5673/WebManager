@@ -107,11 +107,11 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
       {/* Site Preview */}
       <SitePreview projectName={project.name} url={primaryUrl} />
 
-      <div className="p-2.5 sm:p-5 space-y-2 sm:space-y-4">
+      <div className="p-3.5 sm:p-5 space-y-3 sm:space-y-4">
         {/* Header */}
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-[13px] sm:text-[15px] font-semibold text-zinc-100 truncate tracking-tight">
+            <h3 className="text-[15px] font-semibold text-zinc-100 truncate tracking-tight">
               {project.name}
             </h3>
             <a
@@ -119,7 +119,7 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-[11px] sm:text-[12px] text-zinc-500 hover:text-zinc-300 transition-colors mt-0.5"
+              className="inline-flex items-center gap-1 text-[12px] text-zinc-500 hover:text-zinc-300 transition-colors mt-0.5"
             >
               {domain}
               <ExternalLink className="h-2.5 w-2.5" />
@@ -128,30 +128,28 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
           <UptimeBadge status={uptime} />
         </div>
 
-        {/* Metrics grid — hidden on mobile */}
-        <div className="hidden sm:grid grid-cols-2 gap-3">
+        {/* Metrics grid */}
+        <div className="grid grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-3">
           {metrics.map((m) => (
-            <div key={m.label} className="rounded-md bg-zinc-800/30 px-3 py-2">
+            <div key={m.label} className="rounded-md bg-zinc-800/30 px-2.5 py-2 sm:px-3">
               <div className="flex items-center gap-1.5 mb-0.5">
-                <m.icon className="h-3 w-3 text-zinc-600" />
-                <span className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider">
+                <m.icon className="h-3 w-3 text-zinc-600 hidden sm:block" />
+                <span className="text-[9px] sm:text-[10px] text-zinc-600 font-medium uppercase tracking-wider">
                   {m.label}
                 </span>
               </div>
-              <p className="text-sm font-mono font-semibold text-zinc-200">
+              <p className="text-[13px] sm:text-sm font-mono font-semibold text-zinc-200">
                 {m.value}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Uptime history bar — hidden on mobile */}
-        <div className="hidden sm:block">
-          <UptimeBar history={uptimeHistory} />
-        </div>
+        {/* Uptime history bar */}
+        <UptimeBar history={uptimeHistory} />
 
-        {/* Sparkline — hidden on mobile */}
-        <div className="hidden sm:block pt-1">
+        {/* Sparkline */}
+        <div className="pt-1">
           <MiniSparkline data={analytics} metric="visitors" color="#3b82f6" />
         </div>
 
