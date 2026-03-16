@@ -104,8 +104,10 @@ export function SiteCard({ project, analytics, uptime, uptimeHistory, onExpand }
       onClick={onExpand}
       className="cursor-pointer group rounded-lg border border-zinc-800/80 bg-zinc-900/30 hover:bg-zinc-900/60 hover:border-zinc-700/80 transition-colors overflow-hidden"
     >
-      {/* Site Preview */}
-      <SitePreview projectName={project.name} url={primaryUrl} />
+      {/* Site Preview — hidden on mobile for compact cards */}
+      <div className="hidden sm:block">
+        <SitePreview projectName={project.name} url={primaryUrl} />
+      </div>
 
       <div className="p-3.5 sm:p-5 space-y-3 sm:space-y-4">
         {/* Header */}
