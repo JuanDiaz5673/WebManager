@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProjects, getDeployments, getZones, checkUptime } from "@/lib/cloudflare-api";
 import { getZoneAnalytics } from "@/lib/cloudflare-graphql";
-import { getUptimeHistory, storeUptimeCheck } from "@/lib/uptime-kv";
+import { getUptimeHistory } from "@/lib/uptime-kv";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { format, subDays } from "date-fns";
 import type { AnalyticsData } from "@/types/cloudflare";
@@ -96,16 +96,6 @@ export async function GET() {
           })),
           kv ? getUptimeHistory(kv, project.name).catch(() => null) : Promise.resolve(null),
         ]);
-
-        // Also store this check in KV for history tracking
-        if (kv && uptime.status !== "unknown") {
-          storeUptimeCheck(kv, project.name, primaryUrl, {
-            status: uptime.status,
-            statusCode: uptime.statusCode,
-            responseTime: uptime.responseTime,
-            checkedAt: uptime.checkedAt,
-          }).catch(() => {});
-        }
 
         return {
           project: { ...project, recent_deployments: deployments },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProjects } from "@/lib/cloudflare-api";
-import { storeUptimeCheck } from "@/lib/uptime-kv";
+import { storeUptimeCheck, clearAllUptimeHistory } from "@/lib/uptime-kv";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { UptimeCheck } from "@/types/cloudflare";
 
@@ -13,8 +13,9 @@ async function checkSite(url: string): Promise<UptimeCheck> {
   const start = Date.now();
   try {
     const res = await fetch(url, {
-      method: "HEAD",
-      signal: AbortSignal.timeout(10000),
+      method: "GET",
+      signal: AbortSignal.timeout(15000),
+      redirect: "follow",
     });
     return {
       status: res.ok ? "up" : "down",
@@ -77,6 +78,32 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to run uptime checks" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const cronSecret = request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("key");
+  const expectedSecret = process.env.CRON_SECRET;
+
+  if (expectedSecret && cronSecret !== expectedSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { env } = getCloudflareContext();
+  const kv = env.UPTIME_KV;
+
+  if (!kv) {
+    return NextResponse.json({ error: "KV not bound" }, { status: 500 });
+  }
+
+  try {
+    const deleted = await clearAllUptimeHistory(kv);
+    return NextResponse.json({ cleared: deleted });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to clear history" },
       { status: 500 }
     );
   }

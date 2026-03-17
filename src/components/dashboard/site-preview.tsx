@@ -15,10 +15,8 @@ const IFRAME_H = 720;
 
 export function SitePreview({ projectName, url, scrollable = false, className }: SitePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.25);
-  const [containerHeight, setContainerHeight] = useState(0);
+  const [layout, setLayout] = useState({ scale: 0.25, isMobile: false, containerHeight: 0 });
   const [useFallback, setUseFallback] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [interacting, setInteracting] = useState(false);
 
   useEffect(() => {
@@ -27,13 +25,17 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
 
     const observer = new ResizeObserver(([entry]) => {
       const width = entry.contentRect.width;
-      setScale(width / IFRAME_W);
-      setIsMobile(width < 500);
-      setContainerHeight(entry.contentRect.height);
+      setLayout({
+        scale: width / IFRAME_W,
+        isMobile: width < 500,
+        containerHeight: entry.contentRect.height,
+      });
     });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  const { scale, isMobile, containerHeight } = layout;
 
   // On mobile cards, always use thumbnail for performance
   const showThumbnail = useFallback || (isMobile && !scrollable);
@@ -48,7 +50,7 @@ export function SitePreview({ projectName, url, scrollable = false, className }:
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden bg-zinc-900 ${className ?? ""}`}
+      className={`relative w-full overflow-hidden ${className ?? "bg-zinc-900"}`}
       style={scaledHeight ? { height: scaledHeight } : undefined}
     >
       {showThumbnail ? (

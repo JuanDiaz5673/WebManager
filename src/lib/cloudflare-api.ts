@@ -83,8 +83,9 @@ export async function checkUptime(url: string): Promise<UptimeStatus> {
   const start = Date.now();
   try {
     const res = await fetch(url, {
-      method: "HEAD",
-      signal: AbortSignal.timeout(10000),
+      method: "GET",
+      signal: AbortSignal.timeout(15000),
+      redirect: "follow",
     });
 
     return {

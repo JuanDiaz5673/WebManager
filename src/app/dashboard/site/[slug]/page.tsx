@@ -19,6 +19,7 @@ import {
   Shield,
 } from "lucide-react";
 import { format, subDays, parseISO, formatDistanceStrict } from "date-fns";
+import { formatNumber, formatBytes } from "@/lib/utils";
 import type {
   PagesProject,
   PagesDeployment,
@@ -96,18 +97,6 @@ const emptyAnalytics: AnalyticsData = {
   totalBandwidth: 0,
 };
 
-function formatNumber(n: number): string {
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  return n.toLocaleString();
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes >= 1e9) return `${(bytes / 1e9).toFixed(1)} GB`;
-  if (bytes >= 1e6) return `${(bytes / 1e6).toFixed(1)} MB`;
-  if (bytes >= 1e3) return `${(bytes / 1e3).toFixed(1)} KB`;
-  return `${bytes} B`;
-}
 
 export default function SiteDetailPage() {
   const params = useParams();

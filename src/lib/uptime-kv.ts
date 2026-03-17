@@ -81,3 +81,9 @@ export async function getAllUptimeHistories(
 
   return histories;
 }
+
+export async function clearAllUptimeHistory(kv: KVNamespace): Promise<number> {
+  const list = await kv.list({ prefix: KV_PREFIX });
+  await Promise.all(list.keys.map(({ name }) => kv.delete(name)));
+  return list.keys.length;
+}

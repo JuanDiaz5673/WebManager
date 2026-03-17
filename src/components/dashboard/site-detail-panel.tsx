@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 import { format, subDays, parseISO } from "date-fns";
+import { formatNumber, formatBytes, getCustomDomain } from "@/lib/utils";
 import type {
   PagesProject,
   PagesDeployment,
@@ -37,24 +38,6 @@ const emptyAnalytics: AnalyticsData = {
   totalRequests: 0,
   totalBandwidth: 0,
 };
-
-function formatNumber(n: number): string {
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  return n.toLocaleString();
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes >= 1e9) return `${(bytes / 1e9).toFixed(1)} GB`;
-  if (bytes >= 1e6) return `${(bytes / 1e6).toFixed(1)} MB`;
-  if (bytes >= 1e3) return `${(bytes / 1e3).toFixed(1)} KB`;
-  return `${bytes} B`;
-}
-
-function getCustomDomain(project: PagesProject): string {
-  const custom = project.domains.find((d) => !d.endsWith(".pages.dev"));
-  return custom || project.domains[0] || project.subdomain;
-}
 
 interface SiteDetailPanelProps {
   project: PagesProject & { recent_deployments?: PagesDeployment[] };
@@ -183,7 +166,7 @@ export function SiteDetailPanel({
           </button>
 
           {/* Preview */}
-          <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[300px] sm:h-[420px] md:h-[540px] sm:rounded-t-2xl overflow-hidden !bg-[#0c0c0e]" />
+          <SitePreview projectName={project.name} url={primaryUrl} scrollable className="h-[300px] sm:h-[420px] md:h-[540px] sm:rounded-t-2xl overflow-hidden bg-[#0c0c0e]" />
 
           {/* Header — below preview */}
           <div className="px-4 sm:px-6 pt-3 pb-2 flex items-start justify-between">
